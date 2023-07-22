@@ -1,15 +1,40 @@
 from django.shortcuts import render
 from django.contrib.auth import authenticate, login, logout
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect,JsonResponse
 from django.urls import reverse
 from django.db import IntegrityError
 from .models import *
+from datetime import datetime
 from django.contrib.auth.models import User
+from .forms import *
 
 # Create your views here.
 
+def binary_search(arr, target):
+    left, right = 0, len(arr) - 1
+    while left <= right:
+        mid = (left + right) // 2
+        if arr[mid] == target:
+            return True
+        elif arr[mid] < target:
+            right = mid - 1
+        else:
+            left = mid + 1
+    return False
+
 def index(request):
     if request.user.is_authenticated:
+        if request.method == "POST":
+            timestamp = datetime.now()
+            input_value_str = request.POST["input_value"]
+            input_value = [int(x.strip()) for x in input_value_str.split(",")]
+            input_value.sort(reverse=True)
+            search = int(request.POST["search"])
+            result = binary_search(input_value, search)
+            data = Data(input_value=input_value, timestamp=timestamp, user=request.user)
+            data.save()
+
+            return JsonResponse({'result': result})
         return render(request, "project/index.html")
     else:
         return HttpResponseRedirect(reverse("login"))
