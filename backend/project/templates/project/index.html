@@ -1,0 +1,59 @@
+<!-- project/index.html -->
+{% extends 'project/layout.html' %}
+{% load static %}
+{% block title %}Document{% endblock %}
+
+{% block body %}
+
+    <h1>Hi {{user.username}}</h1>
+    <div style="margin: 70px 10px 10px 10px;">
+        <!-- <h1>Create New Post</h1> -->
+        <div class="border border-success" style="margin: 10px 10px 10px 10px; position: relative;">
+            <div style="margin: 10px 10px 10px 10px;">
+                <form id="khojForm" class="form-group">
+                    {% csrf_token %}
+                    <label for="input_value">Input Values:</label>
+                    <input type="text" name="input_value" class="form-control">
+                    <label for="search">Search Value:</label>
+                    <input type="text" name="search" class="form-control">
+                    <br>
+                    <input type="submit" value="Khoj" class="btn btn-success">
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="resultDiv"></div>
+
+    <script>
+        // AJAX form submission
+        document.getElementById('khojForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+            const form = event.target;
+            const formData = new FormData(form);
+
+            fetch('', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                const resultDiv = document.getElementById('resultDiv');
+                if (data.result) {
+                    resultDiv.innerHTML = '<p>True</p>';
+                } else {
+                    resultDiv.innerHTML = '<p>False</p>';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                const resultDiv = document.getElementById('resultDiv');
+                resultDiv.innerHTML = '<p>Error occurred. Please try again.</p>';
+            });
+        });
+    </script>
+
+{% endblock %}
