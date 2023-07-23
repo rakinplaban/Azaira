@@ -18,3 +18,5 @@ After initaiting you have to activate it.
 ```source env/bin/activate```
 **on Windows**:
 ```env\Scripts\activate```
+
+Now, you have to install necessary packeges. The `requriements.txt` file contains the list of them. To install them you can use this command ```pip install -r requirements.txt```
