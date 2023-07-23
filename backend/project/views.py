@@ -10,6 +10,7 @@ from .forms import *
 
 # Create your views here.
 
+# binary search algorithm
 def binary_search(arr, target):
     left, right = 0, len(arr) - 1
     while left <= right:
@@ -26,11 +27,16 @@ def index(request):
     if request.user.is_authenticated:
         if request.method == "POST":
             timestamp = datetime.now()
+            # input from user by form
             input_value_str = request.POST["input_value"]
+            # convert to list of integers
             input_value = [int(x.strip()) for x in input_value_str.split(",")]
+            # reverse sort the list
             input_value.sort(reverse=True)
             search = int(request.POST["search"])
+            # apply binary search on the list and find the targeted value
             result = binary_search(input_value, search)
+            # save the data in the database
             data = Data(input_value=input_value, timestamp=timestamp, user=request.user)
             data.save()
 

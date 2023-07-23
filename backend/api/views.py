@@ -1,11 +1,10 @@
 from django.shortcuts import render
 from rest_framework import status
 from rest_framework.response import Response
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view
 from .serializers import *
 from project.models import *
 from rest_framework.authtoken.models import Token
-from rest_framework.permissions import IsAuthenticated
 from datetime import datetime
 # Create your views here.
 @api_view(['GET'])
@@ -49,37 +48,10 @@ def registration_view(request):
             data['response'] = 'Registration Successful'
             data['username'] = account.username
             data['email'] = account.email
-            token = Token.objects.create(user=account).key
-            data['token'] = token
+            token , create = Token.objects.get_or_create(user=account)
+            data['token'] = token.key
         else:
             data = serialiser.errors
         return Response(data)
     
 
-@api_view(['POST'])
-def api_login_view(request):
-    if request.method == 'POST':
-        serialiser = LoginSerializer(data=request.data)
-        data = {}
-        if serialiser.is_valid():
-            account = serialiser.validated_data['account']
-            data['response'] = 'Login Successful'
-            data['username'] = account.username
-            token = Token.objects.create(user=account).key
-            data['token'] = token
-        else:
-            data = serialiser.errors
-        return Response(data)
-
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])  # Only authenticated users can access this view
-def api_logout_view(request):
-    if request.method == 'POST':
-        # Get the user's token
-        token = Token.objects.get(user=request.user)
-        
-        # Delete the user's token
-        token.delete()
-        
-        # Return a response to indicate successful logout
-        return Response({'message': 'Logout Successful'}, status=status.HTTP_200_OK)
