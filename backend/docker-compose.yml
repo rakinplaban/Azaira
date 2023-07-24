@@ -1,0 +1,21 @@
+version: "3.11"
+
+services:
+  db:
+    image: postgres
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=test
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=qnr63363
+
+  web:
+    build: .
+    command: python manage.py runserver 0.0.0.0:800
+    volumes:
+      - .:/code
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
